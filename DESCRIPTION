@@ -1,0 +1,9 @@
+Package: fluidSCqpcr
+Title: Pre-processing, analysis and visualisation of (Biomark) single-cell qPCR data. Integrates to monocle package.
+Version: 0.0.0.9000
+Authors@R: person("Ruben", "Dries", email = "rubendries@gmail.com", role = c("aut", "cre"))
+Description: The fluidSCqpcr is initially designed to pre-process, analyse and visualise single-cell qPCR data from the fluidigm C1 + Biomark platform.  
+Depends: R (>= 3.1.3)
+License: GPL-3
+LazyData: true
+Imports:
