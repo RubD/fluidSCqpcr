@@ -12,7 +12,7 @@
 #' @param show_labels boolean to show gene / sample labels, defaults to TRUE
 #' @return returns a mds plot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' wcmds_SC()
 

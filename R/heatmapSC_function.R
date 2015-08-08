@@ -9,7 +9,7 @@
 #' @param hmcolor give your own colors or colorpalette
 #' @return returns a heatmap plot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' heatmapSC()
 

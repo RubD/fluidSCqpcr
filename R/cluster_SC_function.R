@@ -14,7 +14,7 @@
 #' @param cluster_column_name name of column that will be created with the clustering results
 #' @return returns a fluidSCproc S3 object appended with the cluster results
 #' @export
-#' @details 
+#' @details NA 
 #' @examples
 #' cluster_SC()
 

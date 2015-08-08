@@ -23,7 +23,7 @@
 #' @param corr_genes_selection selection of genes to see on the plot, defaults to NULL = all genes if corGenes = T
 #' @return returns a list with PCAdata, PCAscores, pcaplot and screeplot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' PCA_SC()
 

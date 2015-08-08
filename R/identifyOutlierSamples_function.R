@@ -7,7 +7,7 @@
 #' @param color_outliers_probability cutoff to color outliers based on quantile probability distribution
 #' @return returns a boxplot with sample names and possible outliers colored in red
 #' @export
-#' @details 
+#' @details NA
 #' 
 #' @references Michael C. Oldham et al. "Functional Organization of the Transcriptome in Human Brain" Supplement
 #' @examples

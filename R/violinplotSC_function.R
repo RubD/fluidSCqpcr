@@ -8,7 +8,7 @@
 #' @param groupColumn column name with group information, will be visualized in different facets
 #' @return returns a violinplot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' violinplotSC()
 

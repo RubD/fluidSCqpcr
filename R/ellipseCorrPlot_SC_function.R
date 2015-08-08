@@ -13,7 +13,7 @@
 #' @param ...
 #' @return returns a ellipse scatterplot with correlation that are translated in ellipse images
 #' @export
-#' @details 
+#' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' ellipseCorrPlot_SC()

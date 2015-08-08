@@ -9,7 +9,7 @@
 #' @param groupCol column name different sample groups, will be displayed separately
 #' @return returns a list with data and plot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' show_IQRexpression_range()
 

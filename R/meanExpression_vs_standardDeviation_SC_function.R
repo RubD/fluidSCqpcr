@@ -12,7 +12,7 @@
 #' @param log2Ex_COV_abline value to draw a line with constant COV on plot, defaults to 0.25 (25 %)
 #' @return returns a list with plot and corresponding data
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' meanExpression_vs_standardDeviation_SC()
 #' 

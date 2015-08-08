@@ -9,7 +9,7 @@
 #' @param show_labels boolean to show labels, defaults to TRUE
 #' @return returns a list with plot and corresponding data
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' meanExpression_vs_variance_SC()
 

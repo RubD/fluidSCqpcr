@@ -10,7 +10,7 @@
 #' @param coord_ratio/binwidth graphical parameters that need to be adjusted for proper visualization (should have the same value ideally)
 #' @return returns a dotplot
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' dotplotSC()
 

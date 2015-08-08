@@ -14,7 +14,7 @@
 #' @param smooth_method method to create smoothed line
 #' @return returns a scatterplot with smoothed line and (always linear) correlation score
 #' @export
-#' @details 
+#' @details NA
 #' @examples
 #' scatterplot_SC()
 

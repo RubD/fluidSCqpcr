@@ -6,7 +6,7 @@
 #' @param lwd linewidth
 #' @return returns a histogram with line density
 #' @export
-#' @details 
+#' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' plotMarginal_SC()
@@ -44,7 +44,7 @@ plotMarginal_SC <- function(variable, lwd = 2) {
 #' @param dfr dataframe with expression values for pairwise comparison
 #' @return returns a scatterplot between 2 variables
 #' @export
-#' @details 
+#' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' plotScatter_SC()
@@ -105,7 +105,7 @@ plotScatter_SC <- function(dfr, xVar, yVar, cexPoints = 1.3, cexXAxis = 1.3, cex
 #' @param xVar, yVar variables for correlation score
 #' @return returns a spearman correlation score
 #' @export
-#' @details 
+#' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' plotCorValue_SC()
@@ -168,7 +168,7 @@ plotCorValue_SC <- function(xVar, yVar, cexText = 7.5, cexCI = 1.8, cor_use = "c
 #' @param sorted_selected_genes subset of genes to select for visualization
 #' @return returns a histogram with line density
 #' @export
-#' @details 
+#' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' matrixplot_SC()
