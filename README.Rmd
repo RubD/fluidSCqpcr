@@ -1,0 +1,14 @@
+---
+title: "README fluidSCqpcr package"
+author: "Ruben Dries"
+date: "8 Aug 2015"
+output: html_document
+---
+
+# fluidSCqpcr
+
+Package to pre-process, analyze and visualize single-cell qPCR data. Developed to be used with Fluidigm C1 - Biomark data, but can also be used with other kind of data. This is the first raw version and has not yet been extensively tested. In the future I will try to couple it with other more advanced analysis methods and packages, such as monocle, mast and sincell.
+
+## Usage
+
+To be continued.
