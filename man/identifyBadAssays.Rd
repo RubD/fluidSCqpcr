@@ -4,12 +4,15 @@
 \alias{identifyBadAssays}
 \title{Function to identifie bad assays}
 \usage{
-identifyBadAssays(fluidSCraw, min_ratio_goodVSbad = 1)
+identifyBadAssays(fluidSCraw, min_ratio_goodVSbad = 1,
+  min_good_datapoints = 0)
 }
 \arguments{
 \item{fluidSCraw}{fluidSCraw S3 object}
 
 \item{min_ratio_goodVSbad}{ratio of number of good calls over bad calls, ratio = #good/#bad. Defaults to 1, i.e. minimum half of the calls must be good}
+
+\item{min_good_datapoints}{minimum number of good quality datapoints needed}
 }
 \value{
 returns list with overview of valued and result, i.e. names of assays that do not meet the requirements

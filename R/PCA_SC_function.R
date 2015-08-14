@@ -15,6 +15,7 @@
 #' @param distMethod choose method to create distance matrix
 #' @param corrMethod choose correlation algorithm if clustMethod = "Correlation"
 #' @param hclustMethod choose clustering method of distance matrix, defaults to average
+#' @param NAvalues choose to remove or replace assays with NA values
 #' @param centerpoint boolean to show center of the different groups, defaults to TRUE
 #' @param segments boolean to show segments on plot, defaults to TRUE
 #' @param corcirc boolean to show correlation circle, defaults to FALSE
@@ -29,7 +30,7 @@
 
 PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_gene_contributions = 5,
                    nrClust = 1, clustMethod = c("Kmeans","Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1", secondPC = "PC2",
-                   distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", 
+                   distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", NAvalues = c("remove_assays","replace_with_0"),
                    centerpoint = T, segments = T, corcirc = F, corGenes = T, labeling = F,  corr_genes_selection = NULL) {
   
   
@@ -40,6 +41,20 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
+  
+  ## for merged fluidSCproc objects, what to do with NA values?
+  NAvalues <- match.arg(NAvalues)
+  
+  # remove genes with NA values
+  if(NAvalues == "remove_assays") {
+    NAgenes <- colnames(normMatrix)[apply(normMatrix, 2, FUN = function(x) any(is.na(x)))]
+    normMatrix <- normMatrix[,-(which(colnames(normMatrix) %in% NAgenes))]
+  } 
+  # replace NA values with 0
+  else if(NAvalues == "replace_with_0") {
+    normMatrix[is.na(normMatrix)] <- 0
+  } else stop("Choose one of the 2 options to take care of NA values")
+  
   
   # do Principal Component Analysis
   PCAdata <- prcomp(normMatrix, scale. = PCAscaled)

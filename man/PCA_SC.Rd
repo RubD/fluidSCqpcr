@@ -8,8 +8,9 @@ PCA_SC(fluidSCproc, based_on_values = "log2Ex", PCAscaled = T,
   nr_gene_contributions = 5, nrClust = 1, clustMethod = c("Kmeans",
   "Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1",
   secondPC = "PC2", distMethod = "euclidean", corrMethod = "pearson",
-  hclustMethod = "average", centerpoint = T, segments = T, corcirc = F,
-  corGenes = T, labeling = F, corr_genes_selection = NULL)
+  hclustMethod = "average", NAvalues = c("remove_assays", "replace_with_0"),
+  centerpoint = T, segments = T, corcirc = F, corGenes = T,
+  labeling = F, corr_genes_selection = NULL)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -33,6 +34,8 @@ PCA_SC(fluidSCproc, based_on_values = "log2Ex", PCAscaled = T,
 \item{corrMethod}{choose correlation algorithm if clustMethod = "Correlation"}
 
 \item{hclustMethod}{choose clustering method of distance matrix, defaults to average}
+
+\item{NAvalues}{choose to remove or replace assays with NA values}
 
 \item{centerpoint}{boolean to show center of the different groups, defaults to TRUE}
 
