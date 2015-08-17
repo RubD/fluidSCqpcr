@@ -17,12 +17,12 @@
 
 
 heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
-                      clust_method = c("average","complete","ward.D","ward.D2","single","median"),
-                      NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0,
+                      clust_method = c("average","complete","ward.D","ward.D2","single","median"),NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0,
                       hmcolor =  NULL, ...) {
   
   
   library(gplots)
+  library(reshape2)
   
   if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
@@ -63,14 +63,17 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method 
   
   if(distance_method %in% c("pearson","spearman")) {
     
-    my_heatmap <- heatmap.2(as.matrix(t(normMatrix)), distfun = function(x) as.dist(1 - cor(t(x),method = distance_method)), trace = "none", scale = "row",col = hmcolor, ... )
+    my_heatmap <- heatmap.2(as.matrix(t(normMatrix)), hclustfun = function(x) hclust(x, method = clust_method),
+                            distfun = function(x) as.dist(1 - cor(t(x),method = distance_method)),
+                            trace = "none", scale = "row",col = hmcolor, ... )
     
     
   } else if(distance_method %in% c("euclidean","maximum","manhatten","binary")) {
     
-    my_heatmap <- heatmap.2(as.matrix(t(normMatrix)), distfun = function(x) dist(x, method = distance_method), trace = "none", scale = "row",col = hmcolor, ... )
+    my_heatmap <- heatmap.2(as.matrix(t(normMatrix)),hclustfun = function(x) hclust(x, method = clust_method),
+                            distfun = function(x) dist(x, method = distance_method),
+                            trace = "none", scale = "row",col = hmcolor, ... )
     
   } else stop("distance method is not known")
   
 }
-
