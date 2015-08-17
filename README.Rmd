@@ -11,7 +11,8 @@ Package to pre-process, analyze and visualize single-cell qPCR data. Developed t
 
 ## Usage
 
-![pipeline](https://github.com/RubD/fluidSCqpcr/blob/master/Figures/fluidSCqPCR_pipelineRD.pdf)
+![pipeline_pdf](https://github.com/RubD/fluidSCqpcr/blob/master/Figures/fluidSCqPCR_pipelineRD.pdf)
 
+![pipeline_png](https://github.com/RubD/fluidSCqpcr/blob/master/Figures/fluidSCqPCR_pipelineRD.png)
 
 To be continued.
