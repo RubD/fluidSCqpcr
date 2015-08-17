@@ -12,6 +12,8 @@
 #' @param cor_use data to use to calculate correlation score, defaults to "complete.obs"
 #' @param cor_method method for correlation score algorithm, defaults to "pearson"
 #' @param smooth_method method to create smoothed line
+#' @param remove_not_detected boolean to remove or keeop not detected values
+#' @param not_detected_value define what values are considered not detected
 #' @return returns a scatterplot with smoothed line and (always linear) correlation score
 #' @export
 #' @details NA
@@ -19,12 +21,22 @@
 #' scatterplot_SC()
 
 scatterplot_SC <- function(fluidSCproc,  based_on_values = "log2Ex", gene1, gene2, my_formula = "y ~ x", se_display = F, sample_display = F,
-                           cor_use = "complete.obs", cor_method = "pearson", smooth_method = "lm") {
+                           cor_use = "complete.obs", cor_method = "pearson", smooth_method = "lm", remove_not_detected = F, not_detected_value = 0) {
+  
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
   
   subset_normMatrix <- normMatrix[,colnames(normMatrix) %in% c(gene1, gene2) ]
+  
+  # remove not detected rows
+  if(remove_not_detected) {
+    
+    not_detected_rows <- apply(subset_normMatrix, 1, FUN = function(x) any(x == not_detected_value))
+    subset_normMatrix <- subset_normMatrix[!not_detected_rows, ]
+    
+  }
   subset_normMatrix$labels <- rownames(subset_normMatrix)
   
   
@@ -55,3 +67,4 @@ scatterplot_SC <- function(fluidSCproc,  based_on_values = "log2Ex", gene1, gene
   print(sc_pl)
   
 }
+

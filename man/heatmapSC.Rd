@@ -7,7 +7,8 @@
 heatmapSC(fluidSCproc, based_on_values = "log2Ex",
   distance_method = c("pearson", "spearman", "euclidean", "maximum",
   "manhatten", "binary"), clust_method = c("average", "complete", "ward.D",
-  "ward.D2", "single", "median"), hmcolor = NULL, ...)
+  "ward.D2", "single", "median"), NAvalues = c("remove_assays",
+  "replace_with_not_detected"), not_detected_value = 0, hmcolor = NULL, ...)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
@@ -17,6 +18,10 @@ heatmapSC(fluidSCproc, based_on_values = "log2Ex",
 \item{distance_method}{choose method to calculute distance matrix: pearson, spearman, euclidean, maxium, manhatten, binary}
 
 \item{clust_method}{choose method to cluster distance matrix: average, complete, ward.D, ward.D2, single, median}
+
+\item{NAvalues}{how to process NA values, remove or replace with not_detected_value (default = 0)}
+
+\item{not_detected_value}{value to replace NA values with}
 
 \item{hmcolor}{give your own colors or colorpalette}
 }

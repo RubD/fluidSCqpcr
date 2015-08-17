@@ -5,8 +5,8 @@
 \title{dotplotSC}
 \usage{
 dotplotSC(fluidSCproc, based_on_values = "log2Ex", assayCol = "Assays",
-  assays = c("Rpl13a", "Pou5f1"), missingCol = NULL, coord_ratio = 0.6,
-  binwidth = 0.6)
+  assays = c("Rpl13a", "Pou5f1"), missingCol = NULL, facetCol = NULL,
+  coord_ratio = 0.6, binwidth = 0.6, ylimit = 25)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -18,6 +18,10 @@ dotplotSC(fluidSCproc, based_on_values = "log2Ex", assayCol = "Assays",
 \item{assays}{vector with assays to show}
 
 \item{missingCol}{optional column name with information for missing values (or other features)}
+
+\item{facetCol}{column to create facets}
+
+\item{ylimit}{maximum height of y-axis}
 
 \item{coord_ratio/binwidth}{graphical parameters that need to be adjusted for proper visualization (should have the same value ideally)}
 }

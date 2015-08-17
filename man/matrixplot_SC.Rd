@@ -5,7 +5,9 @@
 \title{matrixplot_SC()}
 \usage{
 matrixplot_SC(fluidSCproc, based_on_values = "log2Ex",
-  sorted_selected_genes = c("Pou5f1", "Psma3", "Trp53", "Nanog", "Cdx2"))
+  sorted_selected_genes = c("Pou5f1", "Psma3", "Trp53", "Nanog", "Cdx2"),
+  not_detected_value = 0, replace_not_detected_with_NA = F,
+  cor_method = "spearman", use_method = "pairwise.complete.obs")
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -13,6 +15,14 @@ matrixplot_SC(fluidSCproc, based_on_values = "log2Ex",
 \item{based_on_values}{values to use, defaults to "log2Ex"}
 
 \item{sorted_selected_genes}{subset of genes to select for visualization}
+
+\item{not_detected_value}{value to be considered not expressed}
+
+\item{replace_not_detected_with_NA}{boolean to replace not detected values with NA, so that they can be excluded at correlation calculation step}
+
+\item{cor_method}{correlation algorithm method}
+
+\item{use_method}{data to use for correlation algorithm}
 }
 \value{
 returns a histogram with line density

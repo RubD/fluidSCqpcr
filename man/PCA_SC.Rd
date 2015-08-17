@@ -8,9 +8,10 @@ PCA_SC(fluidSCproc, based_on_values = "log2Ex", PCAscaled = T,
   nr_gene_contributions = 5, nrClust = 1, clustMethod = c("Kmeans",
   "Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1",
   secondPC = "PC2", distMethod = "euclidean", corrMethod = "pearson",
-  hclustMethod = "average", NAvalues = c("remove_assays", "replace_with_0"),
-  centerpoint = T, segments = T, corcirc = F, corGenes = T,
-  labeling = F, corr_genes_selection = NULL)
+  hclustMethod = "average", centerpoint = T, segments = T, corcirc = T,
+  corGenes = T, labeling = F, corr_genes_selection = NULL,
+  NAvalues = c("remove_assays", "replace_with_not_detected"),
+  not_detected_value = 0, print_graphs = T)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -35,8 +36,6 @@ PCA_SC(fluidSCproc, based_on_values = "log2Ex", PCAscaled = T,
 
 \item{hclustMethod}{choose clustering method of distance matrix, defaults to average}
 
-\item{NAvalues}{choose to remove or replace assays with NA values}
-
 \item{centerpoint}{boolean to show center of the different groups, defaults to TRUE}
 
 \item{segments}{boolean to show segments on plot, defaults to TRUE}
@@ -48,6 +47,10 @@ PCA_SC(fluidSCproc, based_on_values = "log2Ex", PCAscaled = T,
 \item{labeling}{boolean to show labels of samples, defaults to FALSE}
 
 \item{corr_genes_selection}{selection of genes to see on the plot, defaults to NULL = all genes if corGenes = T}
+
+\item{NAvalues}{choose to remove or replace assays with NA values}
+
+\item{print_graphs}{boolean to print graphs as output}
 
 \item{nr_gene_contribution}{number of top contributing genes in both directions to show on the PCA plot}
 }

@@ -12,6 +12,8 @@
 #' @param hclustMethod choose method to cluster distance matrix
 #' @param selected_assays make selection of assays if wanted
 #' @param cluster_column_name name of column that will be created with the clustering results
+#' @param NAvalues how to handle NA values, remove or replace with not_detected_value
+#' @param not_detected_value value to replace NA values 
 #' @return returns a fluidSCproc S3 object appended with the cluster results
 #' @export
 #' @details NA 
@@ -19,12 +21,35 @@
 #' cluster_SC()
 
 
-cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", clustMethod = c("Kmeans","Hierarchical", "Correlation"), nrClust = 2,
-                       distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", selected_assays = NULL, cluster_column_name = "clust") {
+cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", nrClust = 2, clustMethod = c("Kmeans","Hierarchical", "Correlation"),
+                       distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", selected_assays = NULL, cluster_column_name = "clust",
+                       NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0) {
+  
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
   usedLoD <- fluidSCproc$proc_info$LoD
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
+  
+  
+  ## for merged fluidSCproc objects, what to do with NA values?
+  
+  NAvalues <- match.arg(NAvalues)
+  
+  # remove genes with NA values
+  if(NAvalues == "remove_assays") {
+    NAgenes <- colnames(normMatrix)[apply(normMatrix, 2, FUN = function(x) any(is.na(x)))]
+    if(identical(NAgenes, character(0))) {
+      normMatrix <- normMatrix
+    }
+    else normMatrix <- normMatrix[,-(which(colnames(normMatrix) %in% NAgenes))]
+  } 
+  # replace NA values with 0
+  else if(NAvalues == "replace_with_not_detected") {
+    normMatrix[is.na(normMatrix)] <- not_detected_value
+  } else stop("Choose one of the 2 options to take care of NA values")
+  
+  
   
   
   scores <- normMatrix
@@ -61,3 +86,6 @@ cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", clustMethod = c
   
   
 }
+
+
+

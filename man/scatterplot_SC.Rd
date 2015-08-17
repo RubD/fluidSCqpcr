@@ -6,7 +6,8 @@
 \usage{
 scatterplot_SC(fluidSCproc, based_on_values = "log2Ex", gene1, gene2,
   my_formula = "y ~ x", se_display = F, sample_display = F,
-  cor_use = "complete.obs", cor_method = "pearson", smooth_method = "lm")
+  cor_use = "complete.obs", cor_method = "pearson", smooth_method = "lm",
+  remove_not_detected = F, not_detected_value = 0)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -28,6 +29,10 @@ scatterplot_SC(fluidSCproc, based_on_values = "log2Ex", gene1, gene2,
 \item{cor_method}{method for correlation score algorithm, defaults to "pearson"}
 
 \item{smooth_method}{method to create smoothed line}
+
+\item{remove_not_detected}{boolean to remove or keeop not detected values}
+
+\item{not_detected_value}{define what values are considered not detected}
 }
 \value{
 returns a scatterplot with smoothed line and (always linear) correlation score

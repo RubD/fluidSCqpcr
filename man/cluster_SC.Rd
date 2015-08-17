@@ -4,20 +4,21 @@
 \alias{cluster_SC}
 \title{Function to cluster single cell data}
 \usage{
-cluster_SC(fluidSCproc, based_on_values = "log2Ex",
-  clustMethod = c("Kmeans", "Hierarchical", "Correlation"), nrClust = 2,
+cluster_SC(fluidSCproc, based_on_values = "log2Ex", nrClust = 2,
+  clustMethod = c("Kmeans", "Hierarchical", "Correlation"),
   distMethod = "euclidean", corrMethod = "pearson",
   hclustMethod = "average", selected_assays = NULL,
-  cluster_column_name = "clust")
+  cluster_column_name = "clust", NAvalues = c("remove_assays",
+  "replace_with_not_detected"), not_detected_value = 0)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
 
-\item{clustMethod}{choose method for clustering samples}
-
 \item{nrClust}{number of clusters you want to detect with Kmeans}
+
+\item{clustMethod}{choose method for clustering samples}
 
 \item{distMethod}{choose method to create distance matrix}
 
@@ -28,6 +29,10 @@ cluster_SC(fluidSCproc, based_on_values = "log2Ex",
 \item{selected_assays}{make selection of assays if wanted}
 
 \item{cluster_column_name}{name of column that will be created with the clustering results}
+
+\item{NAvalues}{how to handle NA values, remove or replace with not_detected_value}
+
+\item{not_detected_value}{value to replace NA values}
 }
 \value{
 returns a fluidSCproc S3 object appended with the cluster results

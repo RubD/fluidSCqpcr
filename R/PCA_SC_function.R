@@ -22,6 +22,7 @@
 #' @param corGenes boolean to show genes that corrleate with sample position, defaults to TRUE
 #' @param labeling boolean to show labels of samples, defaults to FALSE
 #' @param corr_genes_selection selection of genes to see on the plot, defaults to NULL = all genes if corGenes = T
+#' @param print_graphs boolean to print graphs as output
 #' @return returns a list with PCAdata, PCAscores, pcaplot and screeplot
 #' @export
 #' @details NA
@@ -29,9 +30,10 @@
 #' PCA_SC()
 
 PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_gene_contributions = 5,
-                   nrClust = 1, clustMethod = c("Kmeans","Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1", secondPC = "PC2",
-                   distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", NAvalues = c("remove_assays","replace_with_0"),
-                   centerpoint = T, segments = T, corcirc = F, corGenes = T, labeling = F,  corr_genes_selection = NULL) {
+                  nrClust = 1, clustMethod = c("Kmeans","Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1", secondPC = "PC2",
+                  distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", 
+                  centerpoint = T, segments = T, corcirc = T, corGenes = T, labeling = F,  corr_genes_selection = NULL,
+                  NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, print_graphs = T) {
   
   
   # load libraries
@@ -39,20 +41,26 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   library(grid)
   library(ggplot2)
   
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
+  
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
   
   ## for merged fluidSCproc objects, what to do with NA values?
+  
   NAvalues <- match.arg(NAvalues)
   
   # remove genes with NA values
   if(NAvalues == "remove_assays") {
     NAgenes <- colnames(normMatrix)[apply(normMatrix, 2, FUN = function(x) any(is.na(x)))]
-    normMatrix <- normMatrix[,-(which(colnames(normMatrix) %in% NAgenes))]
+    if(identical(NAgenes, character(0))) {
+      normMatrix <- normMatrix
+    }
+    else normMatrix <- normMatrix[,-(which(colnames(normMatrix) %in% NAgenes))]
   } 
   # replace NA values with 0
-  else if(NAvalues == "replace_with_0") {
-    normMatrix[is.na(normMatrix)] <- 0
+  else if(NAvalues == "replace_with_not_detected") {
+    normMatrix[is.na(normMatrix)] <- not_detected_value
   } else stop("Choose one of the 2 options to take care of NA values")
   
   
@@ -104,6 +112,7 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   pl <- pl + geom_bar(stat = "identity")
   pl <- pl + theme_bw() + coord_flip()
   pl <- pl + labs(list(x = "Principal components",y = "% of variance explained"))
+  if(print_graphs) print(pl)
   
   # contribution of genes
   textpl <- ggplot(varExplDfr[1:10,], aes(x = 1, y = PComp, label = geneContr))
@@ -111,7 +120,7 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   textpl <- textpl + theme_classic()
   textpl <- textpl + labs(list(x="", y = "Principal components"))
   textpl <- textpl + theme(axis.text.x = element_blank())
-  
+  if(print_graphs) print(textpl)
   
   screeplot <- arrangeGrob(pl, textpl, ncol = 2)
   
@@ -231,8 +240,8 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   }
   
   pcaplot <- pcaplot + theme(legend.position = "none")
+  if(print_graphs) print(pcaplot)
   pcaplot <- arrangeGrob(pcaplot)
-  
   
   return(list(PCAdata = PCAdata, screeplot = screeplot, PCAscores = scores, pcaplot = pcaplot))
   

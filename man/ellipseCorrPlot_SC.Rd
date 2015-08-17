@@ -6,6 +6,8 @@
 \usage{
 ellipseCorrPlot_SC(fluidSCproc, based_on_values = "log2Ex",
   sorted_selected_genes = c("Pou5f1", "Psma3", "Trp53", "Nanog"),
+  cor_method = "spearman", use_method = "pairwise.complete.obs",
+  not_detected_value = 0, replace_not_detected_with_NA = F,
   mycol = colorRamp(c("#CC0000", "white", "#3366CC"), space = "Lab"),
   outline = FALSE, col = "grey", upper.panel = c("ellipse", "number",
   "none"), lower.panel = c("ellipse", "number", "none"), diag = c("none",
@@ -19,6 +21,14 @@ ellipseCorrPlot_SC(fluidSCproc, based_on_values = "log2Ex",
 \item{based_on_values}{values to use, defaults to "log2Ex"}
 
 \item{sorted_selected_genes}{select genes for pair-wise correlation, will be displayed in same order}
+
+\item{cor_method}{method for correlation calculation}
+
+\item{use_method}{data to use for correlation calculation, default = "pairwise.complete.obs"}
+
+\item{not_detected_value}{define what values are considered not detected}
+
+\item{replace_not_detected_with_NA}{boolean to replace not detected values with NA so that they can be excluded from correlation calculations}
 
 \item{mycol}{color to use}
 

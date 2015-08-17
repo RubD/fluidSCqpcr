@@ -166,18 +166,29 @@ plotCorValue_SC <- function(xVar, yVar, cexText = 7.5, cexCI = 1.8, cor_use = "c
 #' @param fluidSCproc fluidSCproc S3 object
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param sorted_selected_genes subset of genes to select for visualization
+#' @param not_detected_value value to be considered not expressed
+#' @param replace_not_detected_with_NA boolean to replace not detected values with NA, so that they can be excluded at correlation calculation step
+#' @param cor_method correlation algorithm method
+#' @param use_method data to use for correlation algorithm
 #' @return returns a histogram with line density
 #' @export
 #' @details NA
 #' @references https://hlplab.wordpress.com/2012/03/20/correlation-plot-matrices-using-the-ellipse-library/
 #' @examples
 #' matrixplot_SC()
-matrixplot_SC <- function(fluidSCproc,  based_on_values = "log2Ex",sorted_selected_genes = c("Pou5f1","Psma3","Trp53","Nanog","Cdx2") ) {
+#' 
+matrixplot_SC <- function(fluidSCproc,  based_on_values = "log2Ex",sorted_selected_genes = c("Pou5f1","Psma3","Trp53","Nanog","Cdx2"),
+                          not_detected_value = 0, replace_not_detected_with_NA = F, cor_method = "spearman", use_method = "pairwise.complete.obs") {
+  
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
   normFluidCt <- fluidSCproc$data
-  
-  
   dataset <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(dataset) <- dataset$Samples; dataset <- dataset[, -1]
+  
+  # replace not detected data with NA, can be excluded with selecting proper use method with cor function
+  if(replace_not_detected_with_NA) dataset[dataset == not_detected_value] <- NA
+  
+  
   dataset <- dataset[ ,colnames(dataset) %in% sorted_selected_genes]
   dataset <- dataset[,sorted_selected_genes]
   
@@ -196,10 +207,10 @@ matrixplot_SC <- function(fluidSCproc,  based_on_values = "log2Ex",sorted_select
       }
       if (col < row) {
         if (l < 7) {
-          plotCorValue_SC(dataset[[variables[col]]], dataset[[variables[row]]], cexCI = 1.2)
+          plotCorValue_SC(dataset[[variables[col]]], dataset[[variables[row]]], cexCI = 1.2, cor_use = use_method, cor_method = cor_method)
         }
         if (l >= 7) {
-          plotCorValue_SC(dataset[[variables[col]]], dataset[[variables[row]]], cexCI = 1.2)
+          plotCorValue_SC(dataset[[variables[col]]], dataset[[variables[row]]], cexCI = 1.2, cor_use = use_method, cor_method = cor_method)
         }
       }
     }

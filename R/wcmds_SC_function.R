@@ -22,6 +22,8 @@ wcmds_SC <- function(fluidSCproc, dimensions = 2,  based_on_values = "log2Ex", m
   library("vegan")
   # possible to give weights to samples (or genes)
   
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
+  
   mds_on <- match.arg(mds_on)
   
   normFluidCt <- fluidSCproc$data
@@ -79,3 +81,4 @@ wcmds_SC <- function(fluidSCproc, dimensions = 2,  based_on_values = "log2Ex", m
   
   
 }
+

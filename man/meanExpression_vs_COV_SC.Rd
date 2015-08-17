@@ -6,7 +6,8 @@
 \usage{
 meanExpression_vs_COV_SC(fluidSCproc, based_on_values = "lin2Ex",
   selected_genes = NULL, log_base = NULL, label_deviation = 0.7,
-  show_labels = T, log2Ex_maximum_COV = T, log2Ex_COV_abline = 0.25)
+  show_labels = T, log2Ex_maximum_COV = T, log2Ex_COV_abline = 0.25,
+  print_graphs = T)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -23,7 +24,9 @@ meanExpression_vs_COV_SC(fluidSCproc, based_on_values = "lin2Ex",
 
 \item{log2Ex_maximum_COV}{boolean to draw line with hypothetical maxium Coefficient of Variation (COV)}
 
-\item{log2Ex_COV_abline}{value to draw a line with constant COV on plot, defaults to 0.25 (25 %)}
+\item{log2Ex_COV_abline}{value to draw a line with constant COV on plot, defaults to 0.25}
+
+\item{print_graphs}{print graphs as output}
 }
 \value{
 returns a list with plot and corresponding data

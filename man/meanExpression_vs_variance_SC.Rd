@@ -5,7 +5,8 @@
 \title{meanExpression_vs_variance_SC}
 \usage{
 meanExpression_vs_variance_SC(fluidSCproc, based_on_values = "lin2Ex",
-  log_base = NULL, label_deviation = 0.7, show_labels = T)
+  log_base = NULL, label_deviation = 0.7, show_labels = T,
+  print_graphs = T)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object}
@@ -17,6 +18,8 @@ meanExpression_vs_variance_SC(fluidSCproc, based_on_values = "lin2Ex",
 \item{label_deviation}{jitter on the y-axis for the labels}
 
 \item{show_labels}{boolean to show labels, defaults to TRUE}
+
+\item{print_graphs}{print graphs as output}
 }
 \value{
 returns a list with plot and corresponding data

@@ -6,6 +6,8 @@
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param distance_method choose method to calculute distance matrix: pearson, spearman, euclidean, maxium, manhatten, binary
 #' @param clust_method choose method to cluster distance matrix: average, complete, ward.D, ward.D2, single, median
+#' @param NAvalues how to process NA values, remove or replace with not_detected_value (default = 0)
+#' @param not_detected_value value to replace NA values with
 #' @param hmcolor give your own colors or colorpalette
 #' @return returns a heatmap plot
 #' @export
@@ -15,10 +17,14 @@
 
 
 heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
-                      clust_method = c("average","complete","ward.D","ward.D2","single","median"), hmcolor =  NULL, ...) {
+                      clust_method = c("average","complete","ward.D","ward.D2","single","median"),
+                      NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0,
+                      hmcolor =  NULL, ...) {
   
   
   library(gplots)
+  
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
   clust_method <- match.arg(clust_method)
   distance_method <- match.arg(distance_method)
@@ -28,6 +34,27 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method 
   
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
+  
+  
+  ## for merged fluidSCproc objects, what to do with NA values?
+  NAvalues <- match.arg(NAvalues)
+  
+  # remove genes with NA values
+  if(NAvalues == "remove_assays") {
+    NAgenes <- colnames(normMatrix)[apply(normMatrix, 2, FUN = function(x) any(is.na(x)))]
+    if(identical(NAgenes, character(0))) {
+      normMatrix <- normMatrix
+    }
+    else normMatrix <- normMatrix[,-(which(colnames(normMatrix) %in% NAgenes))]
+  } 
+  # replace NA values with 0
+  else if(NAvalues == "replace_with_not_detected") {
+    normMatrix[is.na(normMatrix)] <- not_detected_value
+  } else stop("Choose one of the 2 options to take care of NA values")
+  
+  
+  
+  
   
   # remove genes with variation (not informative)
   var0Genes <- colnames(normMatrix)[apply(normMatrix, 2, var) == 0]
@@ -46,3 +73,4 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method 
   } else stop("distance method is not known")
   
 }
+

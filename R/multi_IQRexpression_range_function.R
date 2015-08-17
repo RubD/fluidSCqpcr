@@ -1,12 +1,13 @@
 
-#' Function to show expression range of genes based on quantile probabilities
+
+#' Function to show expression range of genes based on quantile probabilities for multiple conditions
 #'
 #' @param fluidSCproc fluidSCproc S3 object
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param high_quantile high cutoff for gene expression range, based on quantile probabilities [0 - 1]
 #' @param low_quantile low cutoff for gene expression range, based on quantile probabilities [0 - 1]
 #' @param sored_selected_assays select subset of assays, will be displayed in same order
-#' @param groupCol column name different sample groups, will be displayed separately
+#' @param groupCol column name different sample groups, will be displayed in same plot
 #' @param print_graphs boolean to print graphs to output
 #' @return returns a list with data and plot
 #' @export
@@ -14,8 +15,10 @@
 #' @examples
 #' show_IQRexpression_range()
 
-show_IQRexpression_range <- function(fluidSCproc, based_on_values = "log2Ex", high_quantile = 0.75, low_quantile = 0.25,
-                                     sorted_selected_assays = NULL, groupCol = NULL, print_graphs = T) {
+
+multi_IQRexpression_range <- function(fluidSCproc, based_on_values = "log2Ex", high_quantile = 0.75, low_quantile = 0.25,
+                                      sorted_selected_assays = NULL, groupCol = NULL, print_graphs = T) {
+  
   
   library(ggplot2)
   library(gridExtra)
@@ -48,6 +51,7 @@ show_IQRexpression_range <- function(fluidSCproc, based_on_values = "log2Ex", hi
     temdfr <- as.data.frame(cbind(highIQR, lowIQR, assay_ND ))
     temdfr$rawSampleNames <- rownames(temdfr)
     temdfr$sampleNames <- paste0(rownames(temdfr)," (", format(temdfr[,"assay_ND"],digits = 1, nsmall = 1),"%)")
+    temdfr$notDetected <- paste0(" (", format(temdfr[,"assay_ND"],digits = 1, nsmall = 1),"%)")
     temdfr <- temdfr[order(temdfr$assay_ND),] # orders the assays based on percentage non detected
     temdfr$sampleNames <- factor(temdfr$sampleNames, levels = temdfr$sampleNames)
     
@@ -57,49 +61,38 @@ show_IQRexpression_range <- function(fluidSCproc, based_on_values = "log2Ex", hi
     
   }
   
+  if(is.null(groupCol)) stop("you need to provide column with group information")
   
+  splitfr <- split(x = normFluidCt, f = normFluidCt[ ,groupCol])
+  templist <- lapply(X = splitfr,FUN =  function(x) create_melted_rangeDfr(x, groupCol))
   
-  # no split by group
-  if(is.null(groupCol)) {
+  finalmdfr <- do.call("rbind",templist)
+  finalmdfr <- finalmdfr[order(finalmdfr$rawSampleNames, finalmdfr$groupNr), ]
+  
+  uniqGenes <- length(unique(finalmdfr$rawSampleNames))
+  uniqGroups <- length(unique(finalmdfr$groupNr))
+  
+  # create y-values that are close to eachother for each assay
+  numbering <- NULL
+  for(number in 1:uniqGenes) {
     
-    mtemdfr <- create_melted_rangeDfr(normFluidCt)
-    
-    # create graphs
-    pl <- ggplot(mtemdfr, aes(x = value, y = sampleNames, col = sampleNames))
-    pl <- pl + geom_line()
-    pl <- pl + theme_bw()
-    pl <- pl + scale_color_discrete(guide=F)
-    pl <- pl + labs(list(x = "log2 expression", y = "Assays (% not detected)"))
-    if(print_graphs) print(pl)
-    
-    rangeplot <- arrangeGrob(pl)
-    
-    return(list(data = mtemdfr, rangeplot = rangeplot ))
+    x <- rep(seq(from = number,to = (number + (0.1 * (uniqGroups - 1))), by = 0.1),each = 2)
+    numbering <- c(numbering, x)
   }
+  finalmdfr$yval <- numbering
   
-  # split by group, selected column
-  else {
-    
-    splitfr <- split(x = normFluidCt, f = normFluidCt[ ,groupCol])
-    templist <- lapply(X = splitfr,FUN =  function(x) create_melted_rangeDfr(x, groupCol))
-    
-    finalmdfr <- do.call("rbind",templist)
-    
-    # create graphs
-    pl <- ggplot(finalmdfr, aes(x = value, y = rawSampleNames, col = rawSampleNames))
-    pl <- pl + geom_line()
-    pl <- pl + theme_bw()
-    pl <- pl + scale_color_discrete(guide=F)
-    pl <- pl + labs(list(x = "log2 expression", y = ""))
-    pl <- pl + facet_grid(groupNr ~ .)
-    if(print_graphs) print(pl)
-    
-    rangeplot <- arrangeGrob(pl)
-    
-    return(list(data = finalmdfr, rangeplot = rangeplot ))
-    
-  }
+  # create unique names for all conditions
+  finalmdfr$sep <- paste0(finalmdfr$rawSampleNames,"_",finalmdfr$groupNr)
   
+  # create graph
+  tplot <- ggplot(finalmdfr, aes(x = value, y = yval, group = sep, col = rawSampleNames))
+  tplot <- tplot + geom_line() + theme_bw() + labs(list(y = "", x = "log2 Expression"))
+  tplot <- tplot + scale_y_continuous(labels = unique(finalmdfr$rawSampleNames)) + scale_color_discrete(guide=F)
+  if(print_graphs) print(tplot)
+  
+  rangeplot <- arrangeGrob(tplot)
+  
+  return(list(data = finalmdfr, rangeplot = rangeplot ))
   
 }
 

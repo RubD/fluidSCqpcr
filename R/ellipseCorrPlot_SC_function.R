@@ -5,6 +5,10 @@
 #' @param fluidSCproc fluidSCproc S3 object
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param sorted_selected_genes select genes for pair-wise correlation, will be displayed in same order
+#' @param cor_method method for correlation calculation
+#' @param use_method data to use for correlation calculation, default = "pairwise.complete.obs"
+#' @param not_detected_value define what values are considered not detected
+#' @param replace_not_detected_with_NA boolean to replace not detected values with NA so that they can be excluded from correlation calculations
 #' @param mycol color to use 
 #' @param outline outline ellipse or not, defaults to FALSE
 #' @param upper.panel information to put in upper panels
@@ -18,11 +22,11 @@
 #' @examples
 #' ellipseCorrPlot_SC()
 
-ellipseCorrPlot_SC <- function (fluidSCproc,  based_on_values = "log2Ex", sorted_selected_genes = c("Pou5f1","Psma3","Trp53","Nanog"),
-                                mycol = colorRamp(c("#CC0000","white","#3366CC"), space="Lab"), outline = FALSE, col = "grey", 
-                                upper.panel = c("ellipse", "number", "none"), lower.panel = c("ellipse", "number", "none"), diag = c("none", "ellipse", "number"),
-                                digits = 2, bty = "n", axes = FALSE, xlab = "", ylab = "", asp = 1, cex.lab = par("cex.lab"), 
-                                cex = 0.75 * par("cex"), mar = 0.1 + c(2, 2, 4, 2), ...)
+ellipseCorrPlot_SC <- function (fluidSCproc,  based_on_values = "log2Ex", sorted_selected_genes = c("Pou5f1","Psma3","Trp53","Nanog"),cor_method = "spearman", use_method = "pairwise.complete.obs",
+                                not_detected_value = 0, replace_not_detected_with_NA = F,mycol = colorRamp(c("#CC0000","white","#3366CC"), space="Lab"), outline = FALSE, col = "grey",
+                                upper.panel = c("ellipse", "number", "none"), lower.panel = c("ellipse", "number", "none"),
+                                diag = c("none", "ellipse", "number"), digits = 2, bty = "n", axes = FALSE, xlab = "", ylab = "",
+                                asp = 1, cex.lab = par("cex.lab"), cex = 0.75 * par("cex"), mar = 0.1 + c(2, 2, 4, 2), ...)
 {
   # this is a modified version of the plotcorr function from the ellipse package
   # this prints numbers and ellipses on the same plot but upper.panel and lower.panel changes what is displayed
@@ -30,6 +34,9 @@ ellipseCorrPlot_SC <- function (fluidSCproc,  based_on_values = "log2Ex", sorted
   # digits specifies the number of digits after the . to round to
   # unlike the original, this function will always print x_i by x_i correlation rather than being able to drop it
   # modified by Esteban Buz
+  
+  if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
+  
   if (!require('ellipse', quietly = TRUE, character = TRUE)) {
     stop("Need the ellipse library")
   }
@@ -39,7 +46,12 @@ ellipseCorrPlot_SC <- function (fluidSCproc,  based_on_values = "log2Ex", sorted
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
   
-  corr <- cor(normMatrix[,colnames(normMatrix) %in% sorted_selected_genes])
+  # replace not detected data with NA, can be excluded with selecting proper use method with cor function
+  if(replace_not_detected_with_NA) normMatrix[normMatrix == not_detected_value] <- NA
+  
+  subMatrix <- normMatrix[,colnames(normMatrix) %in% sorted_selected_genes]
+  print(subMatrix)
+  corr <- cor(subMatrix, method = cor_method, use = use_method)
   corr <- corr[sorted_selected_genes, sorted_selected_genes]
   
   print(corr)
