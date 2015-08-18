@@ -84,10 +84,12 @@ multi_IQRexpression_range <- function(fluidSCproc, based_on_values = "log2Ex", h
   # create unique names for all conditions
   finalmdfr$sep <- paste0(finalmdfr$rawSampleNames,"_",finalmdfr$groupNr)
   
+  print(finalmdfr)
+  
   # create graph
   tplot <- ggplot(finalmdfr, aes(x = value, y = yval, group = sep, col = rawSampleNames))
   tplot <- tplot + geom_line() + theme_bw() + labs(list(y = "", x = "log2 Expression"))
-  tplot <- tplot + scale_y_continuous(labels = unique(finalmdfr$rawSampleNames)) + scale_color_discrete(guide=F)
+  tplot <- tplot + scale_y_continuous(breaks = 1:length(unique(finalmdfr$rawSampleNames)), labels = unique(finalmdfr$rawSampleNames)) + scale_color_discrete(guide=F)
   if(print_graphs) print(tplot)
   
   rangeplot <- arrangeGrob(tplot)
