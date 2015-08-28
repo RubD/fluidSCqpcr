@@ -23,7 +23,9 @@
 
 cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", nrClust = 2, clustMethod = c("Kmeans","Hierarchical", "Correlation"),
                        distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", selected_assays = NULL, cluster_column_name = "clust",
+                       nstart = 25, iter.max = 1000, algorithm = "Hartigan-Wong",
                        NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0) {
+  
   
   if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   
@@ -58,7 +60,7 @@ cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", nrClust = 2, cl
   
   ## CLUSTERING ##
   if (clustMethod == "Kmeans") {
-    K <- kmeans(scores, centers = nrClust, nstart = 25, iter.max = 1000, algorithm = "Hartigan-Wong")
+    K <- kmeans(scores, centers = nrClust, nstart = nstart, iter.max = iter.max, algorithm = algorithm)
     I <- K$cluster
   }
   
