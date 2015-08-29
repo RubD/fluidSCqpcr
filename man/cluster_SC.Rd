@@ -8,7 +8,8 @@ cluster_SC(fluidSCproc, based_on_values = "log2Ex", nrClust = 2,
   clustMethod = c("Kmeans", "Hierarchical", "Correlation"),
   distMethod = "euclidean", corrMethod = "pearson",
   hclustMethod = "average", selected_assays = NULL,
-  cluster_column_name = "clust", NAvalues = c("remove_assays",
+  cluster_column_name = "clust", nstart = 25, iter.max = 1000,
+  algorithm = "Hartigan-Wong", NAvalues = c("remove_assays",
   "replace_with_not_detected"), not_detected_value = 0)
 }
 \arguments{
