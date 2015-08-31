@@ -17,7 +17,7 @@
 #' @examples
 #' normalize_fluidSC()
 
-normalize_fluidSC <- function(fluidSCraw, LoD = 26) {
+normalize_fluidSC <- function(fluidSCraw, LoD = 27) {
   
   
   rawFluidCt <- fluidSCraw$data
@@ -77,8 +77,10 @@ normalize_fluidSC <- function(fluidSCraw, LoD = 26) {
   rawFluidCt$log2ExNorm <- log2ExNorm
   rawFluidCt$lin2ExNorm <- 2^rawFluidCt$log2ExNorm
   
-  
+  Ct_to_LoD_score <- sum(rawFluidCt$Value > LoD & rawFluidCt$Value != 999)
+  sprintf("number of Ct values converted to LoD score = %d", Ct_to_LoD_score)
   
   return(fluidSCproc(rawFluidCt, LoD = LoD))
   
 }
+
