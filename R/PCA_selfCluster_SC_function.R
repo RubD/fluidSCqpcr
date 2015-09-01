@@ -7,14 +7,9 @@
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param PCAscaled boolean to scale data prior to PCA or not, defaults to true
 #' @param nr_gene_contribution number of top contributing genes in both directions to show on the PCA plot
-#' @param nrClust number of clusters you want
-#' @param clustMethod choose method of clustering
 #' @param colorClust colors for the different cluster groups, number of colors and clusters must be the same
 #' @param firstPC first principal component you want to visualize
 #' @param secondPC second principal component you want to visualize
-#' @param distMethod choose method to create distance matrix
-#' @param corrMethod choose correlation algorithm if clustMethod = "Correlation"
-#' @param hclustMethod choose clustering method of distance matrix, defaults to average
 #' @param NAvalues choose to remove or replace assays with NA values
 #' @param centerpoint boolean to show center of the different groups, defaults to TRUE
 #' @param segments boolean to show segments on plot, defaults to TRUE
@@ -27,13 +22,12 @@
 #' @export
 #' @details NA
 #' @examples
-#' PCA_SC()
+#' PCA_selfCluster_SC()
 
-PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_gene_contributions = 5,
-                   nrClust = 1, clustMethod = c("Kmeans","Hierarchical", "Correlation"), colorClust = "red", firstPC = "PC1", secondPC = "PC2",
-                   distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", 
-                   centerpoint = T, segments = T, corcirc = T, corGenes = T, labeling = F,  corr_genes_selection = NULL,
-                   NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, print_graphs = T) {
+PCA_selfCluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_gene_contributions = 5,
+                               colorClust = "red", firstPC = "PC1", secondPC = "PC2", clusterColumn = NULL, 
+                               centerpoint = T, segments = T, corcirc = T, corGenes = T, labeling = F,  corr_genes_selection = NULL,
+                               NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, print_graphs = T) {
   
   
   # load libraries
@@ -42,12 +36,15 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   library(ggplot2)
   
   if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
+  stopifnot(class(fluidSCproc) == "fluidSCproc")
+  if(is.null(clusterColumn)) stop("you need to provide a name for the column with cluster information")
   
   normFluidCt <- fluidSCproc$data
-  normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
+  myformula <- paste0("Samples + ",clusterColumn, " ~ Assays")
+  normMatrix <- dcast(normFluidCt, formula = eval(parse(text = myformula)), value.var = based_on_values)
+  
   
   ## for merged fluidSCproc objects, what to do with NA values?
-  
   NAvalues <- match.arg(NAvalues)
   
   # remove genes with NA values
@@ -66,10 +63,11 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   
   # remove genes with zero variance!
   keepgenes <- !apply(normMatrix, MARGIN = 2, function(x) var(x,na.rm = T)) == 0
-  normMatrix <- normMatrix[, keepgenes]
+  keepgenes <- names(keepgenes)[keepgenes]
+  normMatrix <- normMatrix[, colnames(normMatrix) %in% c("Samples",clusterColumn,keepgenes)]
   
   # do Principal Component Analysis
-  PCAdata <- prcomp(normMatrix, scale. = PCAscaled)
+  PCAdata <- prcomp(normMatrix[,3:ncol(normMatrix)], scale. = PCAscaled)
   
   # geneloadings represent contribution of variables (gene expressions) to individual principal components
   geneloadings <- PCAdata$rotation
@@ -129,34 +127,15 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   screeplot <- arrangeGrob(pl, textpl, ncol = 2)
   
   
-  ### CLUSTER PCA transformed data ###
-  if (nrClust != length(colorClust)) 
-    stop("you must provide the same number of colors as number of clusters")
+  ###  CLUSTER INFORMATION ###
+  clusterVec <- as.vector(normMatrix[,clusterColumn])
   
+  if (length(unique(clusterVec)) != length(colorClust)) 
+    stop("you must provide the same number of colors as number of unique clusters")
+  
+  print(head(PCAdata$x))
   scores <- as.data.frame(PCAdata$x)
-  
-  clustMethod <- match.arg(clustMethod)
-  if (clustMethod == "Kmeans") {
-    K <- kmeans(scores[, c(firstPC, secondPC)], centers = nrClust, 
-                nstart = 25, iter.max = 1000, algorithm = "Hartigan-Wong")
-    I <- K$cluster
-  }
-  
-  else if (clustMethod == "Hierarchical") {
-    H <- hclust(dist(scores[, c(firstPC, secondPC)], method = distMethod), 
-                method = hclustMethod)
-    I <- cutree(H, k = nrClust)
-  }
-  
-  else if (clustMethod == "Correlation") {
-    distfun <- function(x) as.dist(1 - cor(t(x), method = corrMethod))
-    mycordist <- distfun(scores[, c(firstPC, secondPC)])
-    hclustfun <- function(x) hclust(x, method = hclustMethod)
-    Hcor <- hclustfun(mycordist)
-    I <- cutree(Hcor, k = nrClust)
-  }
-  
-  scores$clust <- I
+  scores$clust <- clusterVec
   
   
   ## Calculate center of groups and segment coordinates ##
@@ -197,7 +176,7 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
     return(data.frame(x = xx, y = yy))
   }
   corcir = circle(c(0, 0), npoints = 100)
-  correlations <- as.data.frame(cor(normMatrix, PCAdata$x))
+  correlations <- as.data.frame(cor(normMatrix[,3:ncol(normMatrix)], PCAdata$x))
   correlations[, firstPC] <- correlations[, firstPC] * opt_r
   correlations[, secondPC] <- correlations[, secondPC] * opt_r
   
@@ -250,4 +229,3 @@ PCA_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscaled = T, nr_g
   return(list(PCAdata = PCAdata, screeplot = screeplot, PCAscores = scores, pcaplot = pcaplot))
   
 }
-
