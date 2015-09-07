@@ -1,5 +1,3 @@
-
-
 #' Function to cluster single cell data
 #'
 #' This function merges several clustering methods and appends the result to the fluidSCproc object
@@ -7,40 +5,39 @@
 #' @param based_on_values values to use, defaults to "log2Ex"
 #' @param scaleData boolean to scale data before clustering, default = F
 #' @param clustMethod choose method for clustering samples
+#' @param firstPC/secondPC principal components to use
 #' @param nrClust number of clusters you want to detect with Kmeans
-#' @param distMethod choose method to create distance matrix
-#' @param corrMethod choose correlation score algorithm to use if clustMethod = Correlation
 #' @param hclustMethod choose method to cluster distance matrix
-#' @param selected_assays make selection of assays if wanted
 #' @param cluster_column_name name of column that will be created with the clustering results
-#' @param nstart number of start repetitions for kmeans clustering
-#' @param iter.max maximum number of iterations for kmeans clustering
-#' @param algorithm algorithm to use for kmeans clustering
+#' @param return_sign_loadMatrix boolean to return loadings multiplied by their sign for all PCs, default to FALSE
 #' @param NAvalues how to handle NA values, remove or replace with not_detected_value
-#' @param not_detected_value value to replace NA values 
+#' @param not_detected_value value to replace NA values
+#' @param ... additional parameters for distance methods 
 #' @return returns a fluidSCproc S3 object appended with the cluster results
 #' @export
 #' @details NA 
 #' @examples
-#' cluster_SC()
+#' PCA_based_cluster_SC()
 
-
-cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, nrClust = 2, clustMethod = c("Kmeans","Hierarchical", "Correlation"),
-                       distMethod = "euclidean", corrMethod = "pearson", hclustMethod = "average", selected_assays = NULL, cluster_column_name = "clust",
-                       nstart = 25, iter.max = 1000, algorithm = "Hartigan-Wong",
-                       NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0) {
+PCA_based_cluster_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", scaleData = T, PCAscaled = F,
+                                 clustMethod = c("Kmeans","Hierarchical","Correlation"),
+                                 firstPC = "PC1", secondPC = "PC2", nrClust = 2,
+                                 hclustMethod = c("ward.D","ward.D2","single","complete","average","centroid"),
+                                 cluster_column_name = "PCAclust", return_sign_loadMatrix = F,
+                                 NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, ...) {
   
   
+  ### checks ###
   if(nargs() == 0) stop(paste0("you need to provide parameters, for more info see ?",sys.call()))
   stopifnot(class(fluidSCproc) == "fluidSCproc")
+  
   
   usedLoD <- fluidSCproc$proc_info$LoD
   normFluidCt <- fluidSCproc$data
   normMatrix <- dcast(normFluidCt, formula = Samples ~ Assays, value.var = based_on_values); rownames(normMatrix) <- normMatrix$Samples; normMatrix <- normMatrix[, -1]
   
   
-  ## for merged fluidSCproc objects, what to do with NA values?
-  
+  ### for merged fluidSCproc objects, what to do with NA values? ###
   NAvalues <- match.arg(NAvalues)
   
   # OR remove genes with NA values
@@ -56,50 +53,55 @@ cluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, n
     normMatrix[is.na(normMatrix)] <- not_detected_value
   } else stop("Choose one of the 2 options to take care of NA values")
   
-  # scale data if wanted
+  
+  # first remove genes with zero variance!
+  keepgenes <- !apply(normMatrix, MARGIN = 2, function(x) var(x,na.rm = T)) == 0
+  keepgenes <- names(keepgenes)[keepgenes]
+  normMatrix <- normMatrix[, colnames(normMatrix) %in% c(keepgenes)]
+  
+  ### scale data if wanted ###
   if(scaleData) {
-    
-    # first remove genes with zero variance!
-    keepgenes <- !apply(normMatrix, MARGIN = 2, function(x) var(x,na.rm = T)) == 0
-    keepgenes <- names(keepgenes)[keepgenes]
-    normMatrix <- normMatrix[, colnames(normMatrix) %in% c(keepgenes)]
-    
-    # second scale data
     normMatrix <- scale(normMatrix)
   }
   
-  scores <- normMatrix
-  if(!is.null(selected_assays)) scores <- scores[, selected_assays] # create subset from assays
+  
+  # do Principal Component Analysis
+  PCAdata <- prcomp(normMatrix, scale. = PCAscaled)
+  
+  # geneloadings represent contribution of variables (gene expressions) to individual principal components
+  geneloadings <- PCAdata$rotation
+  signMatrix <- ifelse(sign(geneloadings) == 1, 1, -1) # negative vs positive contribution
+  loadingMatrix <- apply(geneloadings, MARGIN = 2, FUN = function(x) abs(x) / sum(abs(x)) * 100) # relative contribution
+  sign_loadingMatrix <- signMatrix * loadingMatrix 
   
   
-  ## CLUSTERING ##
+  # cluster data
+  scores <- PCAdata$x
+  clustMethod <- match.arg(clustMethod)
+  
   if (clustMethod == "Kmeans") {
-    K <- kmeans(scores, centers = nrClust, nstart = nstart, iter.max = iter.max, algorithm = algorithm)
+    K <- kmeans(scores[, c(firstPC, secondPC)], centers = nrClust, ...)
     I <- K$cluster
   }
   
   else if (clustMethod == "Hierarchical") {
-    H <- hclust(dist(scores, method = distMethod), method = hclustMethod)
+    H <- hclust(dist(scores[, c(firstPC, secondPC)], ...), 
+                method = hclustMethod)
     I <- cutree(H, k = nrClust)
   }
   
   else if (clustMethod == "Correlation") {
-    distfun <- function(x) as.dist(1 - cor(t(x), method = corrMethod))
-    mycordist <- distfun(scores)
+    distfun <- function(x) as.dist(1 - cor(t(x), ...))
+    mycordist <- distfun(scores[, c(firstPC, secondPC)])
     hclustfun <- function(x) hclust(x, method = hclustMethod)
     Hcor <- hclustfun(mycordist)
     I <- cutree(Hcor, k = nrClust)
   }
   
-  
   ## merge cluster data with original data ##
   prepDfr <- as.data.frame(I); prepDfr$Samples <- rownames(prepDfr); colnames(prepDfr)[[1]] <- cluster_column_name
-  if(!is.null(selected_assays)) normFluidCt <- normFluidCt[normFluidCt$Assays %in% selected_assays, ]
   mergeDfr <- merge(normFluidCt, prepDfr, by = "Samples" )
   
-  
-  return(fluidSCproc(mergeDfr, usedLoD))
-  
+  ifelse(return_sign_loadMatrix,  return(sign_loadingMatrix), return(fluidSCproc(mergeDfr, usedLoD)) ) 
   
 }
-

@@ -5,12 +5,12 @@
 #' or gives a vector with gene weights for clustering of the data
 #' @param fluidSCproc fluidSCproc S3 object~
 #' @param based_on_values values to use, defaults to "log2Ex"
+#' @param scaleData boolean to scale data before clustering, default to F
 #' @param sparseClust choose method for clustering from sparcl package
 #' @param wbound parameter for sparse clustering that determines feature weights
 #' @param cluster_column_name name of column that will be created with the clustering results
 #' @param nrClust number of clusters you want to detect (K for sparse kmeans clustering)
 #' @param return_geneWeights return weights of genes to clustering instead of fluidSCproc object
-#' @param selected_assays make selection of assays if wanted
 #' @param NAvalues how to handle NA values, remove or replace with not_detected_value
 #' @param not_detected_value value to replace NA values 
 #' @param ... additional parameters for HierarchicalSparseCluster or KmeansSparseCluster from sparcle package
@@ -19,8 +19,8 @@
 #' @details NA 
 #' @examples
 #' cluster_sparse_SC()
-cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", sparseClust = c("Hierarchical","Kmeans"), wbound = 4, 
-                              cluster_column_name = "clust", nrClust = 2, return_geneWeights = F,selected_assays = NULL,
+cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", scaleData = F, sparseClust = c("Hierarchical","Kmeans"), wbound = 4, 
+                              cluster_column_name = "clust", nrClust = 2, return_geneWeights = F,
                               NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, ...) {
   
   # load libraries
@@ -53,10 +53,17 @@ cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", spar
     normMatrix[is.na(normMatrix)] <- not_detected_value
   } else stop("Choose one of the 2 options to take care of NA values")
   
-  
-  scores <- normMatrix
-  if(!is.null(selected_assays)) scores <- scores[, selected_assays] # create subset from assays
-  
+  # scale data if wanted
+  if(scaleData) {
+    
+    # first remove genes with zero variance!
+    keepgenes <- !apply(normMatrix, MARGIN = 2, function(x) var(x,na.rm = T)) == 0
+    keepgenes <- names(keepgenes)[keepgenes]
+    normMatrix <- normMatrix[, colnames(normMatrix) %in% c(keepgenes)]
+    
+    # second scale data
+    normMatrix <- scale(normMatrix)
+  }
   
   
   if(sparseClust == "Hierarchical") {
@@ -103,9 +110,7 @@ cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", spar
     
     ifelse(return_geneWeights, return(geneWeights), return(fluidSCproc(normFluidCt, usedLoD)))
     
-  }
-  
-  
+  } 
   
 }
 
@@ -117,11 +122,11 @@ cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", spar
 #' It will given an indication about the wbound parameter
 #' @param fluidSCproc fluidSCproc S3 object~
 #' @param based_on_values values to use, defaults to "log2Ex"
+#' @param scaleData boolean to scale data before clustering, default to F
 #' @param sparseClust choose method for clustering from sparcl package
 #' @param nperms number of permutations
 #' @param wbounds vector of values for sparse clustering that determines feature weights
 #' @param K number of cluster if chosen Kmeans as clustering method
-#' @param selected_assays make selection of assays if wanted
 #' @param NAvalues how to handle NA values, remove or replace with not_detected_value
 #' @param not_detected_value value to replace NA values 
 #' @param ... additional parameters for HierarchicalSparseCluster.permute or KmeansSparseCluster.permute from sparcle package
@@ -130,8 +135,11 @@ cluster_sparse_SC <- function(fluidSCproc,  based_on_values = "log2ExNorm", spar
 #' @details NA 
 #' @examples
 #' cluster_sparse_SC_permute()
-cluster_sparse_SC_permute <- function(fluidSCproc, based_on_values = "log2ExNorm",sparseClust = c("Hierarchical","Kmeans"), nperms = 10, wbounds = c(1.5,2:6), K = NULL,
-                                      selected_assays = NULL, NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, ...) {
+cluster_sparse_SC_permute <- function(fluidSCproc, based_on_values = "log2ExNorm",scaleData = F,sparseClust = c("Hierarchical","Kmeans"),
+                                      nperms = 10, wbounds = c(1.5,2:6), K = NULL,
+                                      NAvalues = c("remove_assays","replace_with_not_detected"), not_detected_value = 0, ...) {
+  
+  # function to determine wbound for sparse clustering, w = feature weight
   
   # load libraries
   library(sparcl)
@@ -161,7 +169,17 @@ cluster_sparse_SC_permute <- function(fluidSCproc, based_on_values = "log2ExNorm
   } else stop("Choose one of the 2 options to take care of NA values")
   
   
-  if(!is.null(selected_assays)) normMatrix <- normMatrix[, selected_assays] # create subset from assays
+  # scale data if wanted
+  if(scaleData) {
+    
+    # first remove genes with zero variance!
+    keepgenes <- !apply(normMatrix, MARGIN = 2, function(x) var(x,na.rm = T)) == 0
+    keepgenes <- names(keepgenes)[keepgenes]
+    normMatrix <- normMatrix[, colnames(normMatrix) %in% c(keepgenes)]
+    
+    # second scale data
+    normMatrix <- scale(normMatrix)
+  }
   
   
   if(sparseClust == "Hierarchical") {

@@ -37,6 +37,9 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
   cluster_genes <- match.arg(cluster_genes)
   normFluidCt <- fluidSCproc$data
   
+  ## TEST: if geneWeights provided, only continue with subet of data
+  if(!is.null(geneWeights)) normFluidCt <- normFluidCt[normFluidCt$Assays %in% names(geneWeights), ]
+  
   # split dataframe according to cluster column
   splitlist <- split(normFluidCt, f = normFluidCt[,cluster_column_name])
   
@@ -89,6 +92,7 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       mod2mergetest <- merge(modmergetest, geneWdfr, by.x = "Group.1", by.y  = "genes" )
       
       saveQuantiles <- as.vector(quantile(mod2mergetest$geneWeights, probs = quantile_breaks))
+      
       mod2mergetest$gene_weight <- cut(mod2mergetest$geneWeights,
                                        breaks = c(saveQuantiles), 
                                        include.lowest = T, right = T, labels = quantile_labels)
@@ -105,6 +109,8 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       
       
     } else {
+      
+      if(!is.null(selected_assays)) modmergetest <- modmergetest[modmergetest$Group.1 %in% selected_assays, ]
       
       pl <- ggplot(modmergetest, aes(x = Group.1, y = y, fill = genegroups))
       pl <- pl + geom_bar(stat = "identity") + facet_wrap(~ group, ncol = 1 )
@@ -146,9 +152,17 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       
       geneWdfr <- as.data.frame(geneWeights); geneWdfr$genes <- rownames(geneWdfr)
       
+      
+      
       mod2mergetest <- merge(modmergetest, geneWdfr, by.x = "Group.1", by.y  = "genes" )
       
+      print(head(mod2mergetest))
+      
+      
       saveQuantiles <- as.vector(quantile(mod2mergetest$geneWeights, probs = quantile_breaks))
+      
+      print(saveQuantiles)
+      
       mod2mergetest$gene_weight <- cut(mod2mergetest$geneWeights,
                                        breaks = c(saveQuantiles), 
                                        include.lowest = T, right = T, labels = quantile_labels)
@@ -166,6 +180,7 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       
     } else {
       
+      if(!is.null(selected_assays)) modmergetest <- modmergetest[modmergetest$Group.1 %in% selected_assays, ]
       
       pl <- ggplot(modmergetest, aes(x = Group.1, y = y, fill = genegroups))
       pl <- pl + geom_bar(stat = "identity") + facet_wrap(~ group, ncol = 1 )
@@ -173,10 +188,7 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       pl <- pl + scale_fill_discrete()
       pl
       
-    }
-    
-    
-    
+    }  
     
   }
   

@@ -229,3 +229,4 @@ PCA_selfCluster_SC <- function(fluidSCproc,  based_on_values = "log2Ex", PCAscal
   return(list(PCAdata = PCAdata, screeplot = screeplot, PCAscores = scores, pcaplot = pcaplot))
   
 }
+

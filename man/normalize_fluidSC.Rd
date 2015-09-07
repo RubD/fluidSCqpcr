@@ -4,7 +4,7 @@
 \alias{normalize_fluidSC}
 \title{Function to normalize fluidSCraw object}
 \usage{
-normalize_fluidSC(fluidSCraw, LoD = 26)
+normalize_fluidSC(fluidSCraw, LoD = 27)
 }
 \arguments{
 \item{fluidSCraw}{fluidSCraw S3 object}
