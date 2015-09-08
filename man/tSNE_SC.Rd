@@ -4,14 +4,16 @@
 \alias{tSNE_SC}
 \title{Function to create a t-SNE map from single cell data}
 \usage{
-tSNE_SC(fluidSCproc, based_on_values = "log2Ex", perplexity = 5,
-  clusterColumn = NULL, NAvalues = c("remove_assays",
+tSNE_SC(fluidSCproc, based_on_values = "log2Ex", scaleData = F,
+  perplexity = 5, clusterColumn = NULL, NAvalues = c("remove_assays",
   "replace_with_not_detected"), not_detected_value = 0)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
+
+\item{scaleData}{boolean to scale data before tSNE clustering, default = F}
 
 \item{perplexity}{measure for information about the Shannon entropy, see reference}
 

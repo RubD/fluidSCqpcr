@@ -4,8 +4,8 @@
 \alias{cluster_SC}
 \title{Function to cluster single cell data}
 \usage{
-cluster_SC(fluidSCproc, based_on_values = "log2Ex", nrClust = 2,
-  clustMethod = c("Kmeans", "Hierarchical", "Correlation"),
+cluster_SC(fluidSCproc, based_on_values = "log2Ex", scaleData = F,
+  nrClust = 2, clustMethod = c("Kmeans", "Hierarchical", "Correlation"),
   distMethod = "euclidean", corrMethod = "pearson",
   hclustMethod = "average", selected_assays = NULL,
   cluster_column_name = "clust", nstart = 25, iter.max = 1000,
@@ -16,6 +16,8 @@ cluster_SC(fluidSCproc, based_on_values = "log2Ex", nrClust = 2,
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
+
+\item{scaleData}{boolean to scale data before clustering, default = F}
 
 \item{nrClust}{number of clusters you want to detect with Kmeans}
 
@@ -30,6 +32,12 @@ cluster_SC(fluidSCproc, based_on_values = "log2Ex", nrClust = 2,
 \item{selected_assays}{make selection of assays if wanted}
 
 \item{cluster_column_name}{name of column that will be created with the clustering results}
+
+\item{nstart}{number of start repetitions for kmeans clustering}
+
+\item{iter.max}{maximum number of iterations for kmeans clustering}
+
+\item{algorithm}{algorithm to use for kmeans clustering}
 
 \item{NAvalues}{how to handle NA values, remove or replace with not_detected_value}
 

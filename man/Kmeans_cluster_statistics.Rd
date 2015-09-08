@@ -5,9 +5,10 @@
 \title{Function to determine best number of clusters in kmeans clustering}
 \usage{
 Kmeans_cluster_statistics(fluidSCproc, based_on_values = "log2Ex",
-  test_nrClust = 10, clusGap_B = 500, clusterboot_B = 20,
-  selected_assays = NULL, NAvalues = c("remove_assays",
-  "replace_with_not_detected"), not_detected_value = 0)
+  scaleData = F, test_nrClust = 10, method = c("Kmeans", "sparseKmeans"),
+  wbound = 2, selected_assays = NULL, NAvalues = c("remove_assays",
+  "replace_with_not_detected"), not_detected_value = 0, clusGap_B = 100,
+  clusterboot_B = 100, ...)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
@@ -16,15 +17,15 @@ Kmeans_cluster_statistics(fluidSCproc, based_on_values = "log2Ex",
 
 \item{test_nrClust}{max number of clusters to test}
 
-\item{clusGap_B}{number of monte carlo ("bootstrap") samples for gap statistic}
-
-\item{clusterboot_B}{Number of resampling runs for each scheme for bootstrap method, see clusterboot}
-
 \item{selected_assays}{make selection of assays if wanted}
 
 \item{NAvalues}{how to handle NA values, remove or replace with not_detected_value}
 
 \item{not_detected_value}{value to replace NA values}
+
+\item{clusGap_B}{number of monte carlo ("bootstrap") samples for gap statistic}
+
+\item{clusterboot_B}{Number of resampling runs for each scheme for bootstrap method, see clusterboot}
 }
 \value{
 returns and prints estimations for optimal number of clusters based on 2 different "bootstrap" algorithms (functions)

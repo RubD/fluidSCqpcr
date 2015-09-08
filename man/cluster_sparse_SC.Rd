@@ -5,15 +5,17 @@
 \title{Function to sparse cluster single cell data using the sparcl package}
 \usage{
 cluster_sparse_SC(fluidSCproc, based_on_values = "log2ExNorm",
-  sparseClust = c("Hierarchical", "Kmeans"), wbound = 4,
+  scaleData = F, sparseClust = c("Hierarchical", "Kmeans"), wbound = 4,
   cluster_column_name = "clust", nrClust = 2, return_geneWeights = F,
-  selected_assays = NULL, NAvalues = c("remove_assays",
-  "replace_with_not_detected"), not_detected_value = 0, ...)
+  NAvalues = c("remove_assays", "replace_with_not_detected"),
+  not_detected_value = 0, ...)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
+
+\item{scaleData}{boolean to scale data before clustering, default to F}
 
 \item{sparseClust}{choose method for clustering from sparcl package}
 
@@ -24,8 +26,6 @@ cluster_sparse_SC(fluidSCproc, based_on_values = "log2ExNorm",
 \item{nrClust}{number of clusters you want to detect (K for sparse kmeans clustering)}
 
 \item{return_geneWeights}{return weights of genes to clustering instead of fluidSCproc object}
-
-\item{selected_assays}{make selection of assays if wanted}
 
 \item{NAvalues}{how to handle NA values, remove or replace with not_detected_value}
 

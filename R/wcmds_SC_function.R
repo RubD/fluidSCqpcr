@@ -1,11 +1,10 @@
 
-
-
 #' Function to create Multidimensional scaling plot
 #'
 #' This function creates a MDS plot
 #' @param fluidSCproc fluidSCproc S3 object
 #' @param based_on_values values to use, defaults to "log2Ex"
+#' @param scaleData boolean to scale data before MDS clustering, default = F
 #' @param mds_on do dimentional scaling on Samples or Assays
 #' @param genes_selection make a selection for the genes to consider
 #' @param cluster_column_name colors single genes based on this column

@@ -4,7 +4,7 @@
 \alias{heatmapSC}
 \title{Function to create a heatmap from single cell data}
 \usage{
-heatmapSC(fluidSCproc, based_on_values = "log2Ex",
+heatmapSC(fluidSCproc, based_on_values = "log2Ex", scaleData = F,
   distance_method = c("pearson", "spearman", "euclidean", "maximum",
   "manhatten", "binary"), clust_method = c("average", "complete", "ward.D",
   "ward.D2", "single", "median"), NAvalues = c("remove_assays",
@@ -14,6 +14,8 @@ heatmapSC(fluidSCproc, based_on_values = "log2Ex",
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
+
+\item{scaleData}{boolean to scale data before creating heatmap and clustering, default = F}
 
 \item{distance_method}{choose method to calculute distance matrix: pearson, spearman, euclidean, maxium, manhatten, binary}
 

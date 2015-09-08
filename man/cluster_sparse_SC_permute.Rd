@@ -5,14 +5,16 @@
 \title{Function to determine optimal wbound parameter for cluster_sparse_SC function}
 \usage{
 cluster_sparse_SC_permute(fluidSCproc, based_on_values = "log2ExNorm",
-  sparseClust = c("Hierarchical", "Kmeans"), nperms = 10, wbounds = c(1.5,
-  2:6), K = NULL, selected_assays = NULL, NAvalues = c("remove_assays",
+  scaleData = F, sparseClust = c("Hierarchical", "Kmeans"), nperms = 10,
+  wbounds = c(1.5, 2:6), K = NULL, NAvalues = c("remove_assays",
   "replace_with_not_detected"), not_detected_value = 0, ...)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
 
 \item{based_on_values}{values to use, defaults to "log2Ex"}
+
+\item{scaleData}{boolean to scale data before clustering, default to F}
 
 \item{sparseClust}{choose method for clustering from sparcl package}
 
@@ -21,8 +23,6 @@ cluster_sparse_SC_permute(fluidSCproc, based_on_values = "log2ExNorm",
 \item{wbounds}{vector of values for sparse clustering that determines feature weights}
 
 \item{K}{number of cluster if chosen Kmeans as clustering method}
-
-\item{selected_assays}{make selection of assays if wanted}
 
 \item{NAvalues}{how to handle NA values, remove or replace with not_detected_value}
 

@@ -20,6 +20,8 @@ wcmds_SC(fluidSCproc, dimensions = 2, based_on_values = "log2Ex",
 \item{cluster_column_name}{colors single genes based on this column}
 
 \item{show_labels}{boolean to show gene / sample labels, defaults to TRUE}
+
+\item{scaleData}{boolean to scale data before MDS clustering, default = F}
 }
 \value{
 returns a mds plot

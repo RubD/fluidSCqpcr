@@ -4,6 +4,7 @@
 #' This function creates a heatmap?
 #' @param fluidSCproc fluidSCproc S3 object~
 #' @param based_on_values values to use, defaults to "log2Ex"
+#' @param scaleData boolean to scale data before creating heatmap and clustering, default = F
 #' @param distance_method choose method to calculute distance matrix: pearson, spearman, euclidean, maxium, manhatten, binary
 #' @param clust_method choose method to cluster distance matrix: average, complete, ward.D, ward.D2, single, median
 #' @param NAvalues how to process NA values, remove or replace with not_detected_value (default = 0)
@@ -16,7 +17,7 @@
 #' heatmapSC()
 
 
-heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
+heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
                       clust_method = c("average","complete","ward.D","ward.D2","single","median"), NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0,
                       hmcolor =  NULL, ...) {
   
@@ -53,13 +54,12 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method 
   } else stop("Choose one of the 2 options to take care of NA values")
   
   
-  
-  
-  
   # remove genes with variation (not informative)
   var0Genes <- colnames(normMatrix)[apply(normMatrix, 2, var) == 0]
   normMatrix <- normMatrix[,!colnames(normMatrix) %in% var0Genes]
   
+  # scale data if wanted
+  if(scaleData) normMatrix <- scale(normMatrix)
   
   if(distance_method %in% c("pearson","spearman")) {
     
@@ -77,4 +77,3 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex", distance_method 
   } else stop("distance method is not known")
   
 }
-

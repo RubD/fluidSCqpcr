@@ -4,6 +4,7 @@
 #' This function creates a heatmap?
 #' @param fluidSCproc fluidSCproc S3 object~
 #' @param based_on_values values to use, defaults to "log2Ex"
+#' @param scaleData boolean to scale data before tSNE clustering, default = F
 #' @param perplexity measure for information about the Shannon entropy, see reference
 #' @param clusterColumn name of column with cluster information
 #' @param NAvalues how to process NA values, remove or replace with not_detected_value (default = 0)
@@ -15,7 +16,7 @@
 #' @examples
 #' tSNE_SC()
 
-tSNE_SC <- function(fluidSCproc,  based_on_values = "log2Ex", perplexity = 5, clusterColumn = NULL,
+tSNE_SC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, perplexity = 5, clusterColumn = NULL,
                     NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0) {
   
   # load libraries
@@ -56,8 +57,15 @@ tSNE_SC <- function(fluidSCproc,  based_on_values = "log2Ex", perplexity = 5, cl
     keepgenes <- names(keepgenes)[keepgenes]
     normMatrix <- normMatrix[, colnames(normMatrix) %in% c("Samples",keepgenes)]
     
+    ## scale data
+    if(scaleData) {
+      newMatrix <- scale(as.matrix(normMatrix[,2:ncol(normMatrix)]))
+    } else {
+      newMatrix <- as.matrix(normMatrix[,2:ncol(normMatrix)])
+    }
+    
     ## apply tSNE method
-    tsne_out <- Rtsne(as.matrix(normMatrix[,2:ncol(normMatrix)]), perplexity = perplexity)
+    tsne_out <- Rtsne(newMatrix, perplexity = perplexity)
     dfr <- as.data.frame(tsne_out$Y)
     
     pl <- ggplot(dfr, aes(V1, V2))
@@ -95,8 +103,15 @@ tSNE_SC <- function(fluidSCproc,  based_on_values = "log2Ex", perplexity = 5, cl
     keepgenes <- names(keepgenes)[keepgenes]
     normMatrix <- normMatrix[, colnames(normMatrix) %in% c("Samples",clusterColumn,keepgenes)]
     
+    ## scale data
+    if(scaleData) {
+      newMatrix <- scale(as.matrix(normMatrix[,3:ncol(normMatrix)]))
+    } else {
+      newMatrix <- as.matrix(normMatrix[,3:ncol(normMatrix)])
+    }
+    
     # apply tSNE method
-    tsne_out <- Rtsne(as.matrix(normMatrix[,3:ncol(normMatrix)]), perplexity = perplexity)
+    tsne_out <- Rtsne(newMatrix, perplexity = perplexity)
     dfr <- as.data.frame(tsne_out$Y)
     dfr <- cbind(dfr, cluster = factor(normMatrix[,clusterColumn]))
     

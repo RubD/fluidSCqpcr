@@ -5,7 +5,8 @@
 \title{Function to visualize explained variance by different Kmeans cluster. Creates scree (elbow) plot.}
 \usage{
 Kmeans_cluster_explained_variance(fluidSCproc, based_on_values = "log2Ex",
-  test_nrClust = 10, selected_assays = NULL, NAvalues = c("remove_assays",
+  method = c("Kmeans", "sparseKmeans"), scaleData = F, test_nrClust = 10,
+  wbound = 2, selected_assays = NULL, NAvalues = c("remove_assays",
   "replace_with_not_detected"), not_detected_value = 0, ...)
 }
 \arguments{
