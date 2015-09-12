@@ -17,7 +17,7 @@
 #' heatmapSC()
 
 
-heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
+heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = FALSE, distance_method = c("pearson","spearman","euclidean","maximum","manhatten","binary"),
                       clust_method = c("average","complete","ward.D","ward.D2","single","median"), NAvalues = c("remove_assays","replace_with_not_detected"),not_detected_value = 0,
                       hmcolor =  NULL, ...) {
   
@@ -59,7 +59,7 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, di
   normMatrix <- normMatrix[,!colnames(normMatrix) %in% var0Genes]
   
   # scale data if wanted
-  if(scaleData) normMatrix <- scale(normMatrix)
+  if(scaleData == TRUE) normMatrix <- scale(normMatrix)
   
   if(distance_method %in% c("pearson","spearman")) {
     
@@ -77,3 +77,4 @@ heatmapSC <- function(fluidSCproc,  based_on_values = "log2Ex",scaleData = F, di
   } else stop("distance method is not known")
   
 }
+
