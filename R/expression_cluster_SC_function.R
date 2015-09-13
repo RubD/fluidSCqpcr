@@ -16,6 +16,7 @@
 #' @param quantile_labels give labels to groups created by quantile_breaks
 #' @param alpha_range vector with range for alpha-value
 #' @param selected_assays select subset of assays
+#' @param return_data boolean to return data or graphic plot, default to FALSE
 #' @return returns a barplot with facets for different clusters and important assays highlighted based on assay weights
 #' @export
 #' @details NA 
@@ -24,7 +25,7 @@
 expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", cluster_column_name = "clust", centrality_function = mean, log_base_adjust = 10,
                                   cluster_genes = c("Hierarchical", "Correlation"),nrClust = 6, distMethod = "euclidean", clustMethod = "average",
                                   geneWeights = NULL, quantile_breaks = c(0.25, 0.5, 0.75, 0.95, 1), quantile_labels = c("very low","low","medium","high","very high"),
-                                  alpha_range = c(0.5,1), selected_assays = NULL ) {
+                                  alpha_range = c(0.5,1), selected_assays = NULL, return_data = FALSE ) {
   
   # load libraries
   library(ggplot2)
@@ -58,6 +59,8 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
     aggr_temp$x <- aggr_temp$x - overall_mean$x
     groupname <- paste0("group",split," ",nr_cells," cells")
     aggr_temp$group <- groupname
+    raw_group <- paste0("group",split)
+    aggr_temp$raw_group <- raw_group
     mergelist[[split]] <- aggr_temp
   }
   
@@ -99,6 +102,7 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
       
       
       if(!is.null(selected_assays)) mod2mergetest <- mod2mergetest[mod2mergetest$Group.1 %in% selected_assays, ]
+      
       
       
       pl <- ggplot(mod2mergetest, aes(x = Group.1, y = y, fill = genegroups, alpha = gene_weight))
@@ -192,7 +196,15 @@ expression_cluster_SC <- function(fluidSCproc, based_on_values = "log2ExNorm", c
     
   }
   
+  if(return_data == TRUE) {
+    
+    ifelse(!is.null(geneWeights), return(mod2mergetest), return(modmergetest))  
+    
+  }
   
-  return(pl)
+  else return(pl)
+  
+  
   
 }
+
