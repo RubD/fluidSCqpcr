@@ -4,7 +4,7 @@
 \alias{heatmapSC}
 \title{Function to create a heatmap from single cell data}
 \usage{
-heatmapSC(fluidSCproc, based_on_values = "log2Ex", scaleData = F,
+heatmapSC(fluidSCproc, based_on_values = "log2Ex", scaleData = FALSE,
   distance_method = c("pearson", "spearman", "euclidean", "maximum",
   "manhatten", "binary"), clust_method = c("average", "complete", "ward.D",
   "ward.D2", "single", "median"), NAvalues = c("remove_assays",

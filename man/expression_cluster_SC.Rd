@@ -10,7 +10,7 @@ expression_cluster_SC(fluidSCproc, based_on_values = "log2ExNorm",
   nrClust = 6, distMethod = "euclidean", clustMethod = "average",
   geneWeights = NULL, quantile_breaks = c(0.25, 0.5, 0.75, 0.95, 1),
   quantile_labels = c("very low", "low", "medium", "high", "very high"),
-  alpha_range = c(0.5, 1), selected_assays = NULL)
+  alpha_range = c(0.5, 1), selected_assays = NULL, return_data = FALSE)
 }
 \arguments{
 \item{fluidSCproc}{fluidSCproc S3 object~}
@@ -40,6 +40,8 @@ expression_cluster_SC(fluidSCproc, based_on_values = "log2ExNorm",
 \item{alpha_range}{vector with range for alpha-value}
 
 \item{selected_assays}{select subset of assays}
+
+\item{return_data}{boolean to return data or graphic plot, default to FALSE}
 }
 \value{
 returns a barplot with facets for different clusters and important assays highlighted based on assay weights
